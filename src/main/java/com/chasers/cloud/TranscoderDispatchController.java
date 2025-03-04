@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-public class HomeController {
+public class TranscoderDispatchController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HomeController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TranscoderDispatchController.class);
 
     private static final String s3OutputURI = "s3://cctv-transcoded-video-storage/";
 
