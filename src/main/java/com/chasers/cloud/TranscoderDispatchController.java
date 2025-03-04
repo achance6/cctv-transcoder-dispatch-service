@@ -92,21 +92,7 @@ public class TranscoderDispatchController {
                         Output.builder().preset("low-res").nameModifier("-low-res").build(),
                         Output.builder().preset("medium-res").nameModifier("-medium-res").build(),
                         Output.builder().preset("high-res").nameModifier("-high-res").build()
-//                        ,
-//                        Output.builder()
-//                                .containerSettings(ContainerSettings.builder().container(ContainerType.RAW).build())
-//                                .nameModifier("-thumbnail")
-//                                .videoDescription(VideoDescription.builder()
-//                                        .height(480)
-//                                        .codecSettings(VideoCodecSettings.builder()
-//                                                .codec(VideoCodec.FRAME_CAPTURE)
-//                                                .frameCaptureSettings(FrameCaptureSettings.builder().build())
-//                                                .build())
-//                                        .build())
-//                                .build()
-
-                )
-                .build();
+                ).build();
     }
 
     private static OutputGroup createThumbsOutputGroup(String thumbsOutput) {
