@@ -39,7 +39,7 @@ class TranscoderDispatchControllerTest {
     }
 
     @Test
-    void testHandler(ObjectMapper objectMapper) throws IOException {
+    void testHappyPath(ObjectMapper objectMapper) throws IOException {
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
         request.setPath("/");
         request.setHttpMethod(HttpMethod.POST.toString());
@@ -68,6 +68,19 @@ class TranscoderDispatchControllerTest {
         var response = handler.handleRequest(request, new MockLambdaContext());
 
         assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
-        assertTrue(response.getBody().contains("id"));
+        assertTrue(response.getBody().contains("Job accepted with ID: "));
+    }
+
+    @Test
+    void testBadRequest(ObjectMapper objectMapper) throws IOException {
+        APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
+        request.setPath("/");
+        request.setHttpMethod(HttpMethod.POST.toString());
+
+        request.setBody("");
+
+        var response = handler.handleRequest(request, new MockLambdaContext());
+
+        assertEquals(HttpStatus.BAD_REQUEST.getCode(), response.getStatusCode());
     }
 }
