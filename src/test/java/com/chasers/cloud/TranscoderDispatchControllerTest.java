@@ -1,6 +1,6 @@
 package com.chasers.cloud;
+
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification;
 import io.micronaut.function.aws.proxy.payload1.ApiGatewayProxyRequestEventFunction;
 import io.micronaut.function.aws.proxy.MockLambdaContext;
@@ -33,6 +33,7 @@ class TranscoderDispatchControllerTest {
     static void setupSpec() {
         handler = new ApiGatewayProxyRequestEventFunction();
     }
+
     @AfterAll
     static void cleanupSpec() {
         handler.getApplicationContext().close();
@@ -57,7 +58,7 @@ class TranscoderDispatchControllerTest {
                         new S3EventNotification.S3ObjectEntity("Me at the zoo.mp4", 1100L, "4e088404aece61e07e7cfc8752927f35", "gKpkHSFzm.3lnBK.vAADCoqwAPiMFsOA", "0055AED6DCD90281E5"),
                         "1.0"),
                 new S3EventNotification.UserIdentityEntity("AIDAJDPLRKLG7UEXAMPLE")
-                );
+        );
 
         S3EventNotification eventNotification = new S3EventNotification(List.of(s3Event));
 
@@ -72,7 +73,7 @@ class TranscoderDispatchControllerTest {
     }
 
     @Test
-    void testBadRequest(ObjectMapper objectMapper) throws IOException {
+    void testBadRequest() {
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
         request.setPath("/");
         request.setHttpMethod(HttpMethod.POST.toString());

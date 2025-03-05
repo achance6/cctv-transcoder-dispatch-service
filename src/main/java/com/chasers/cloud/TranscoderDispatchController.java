@@ -1,18 +1,12 @@
 package com.chasers.cloud;
 
-import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.http.HttpStatusCode;
-
-import java.util.Collections;
-import java.util.Map;
 
 @Controller
 public class TranscoderDispatchController {
