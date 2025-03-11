@@ -11,13 +11,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.http.HttpStatusCode;
 import software.amazon.awssdk.regions.Region;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,8 +68,16 @@ public class FunctionRequestHandlerTest {
         request.setBody(s3EventJson);
 
         APIGatewayProxyResponseEvent response = handler.execute(request);
+
+        String regex = "[0-9]{12,}-[a-zA-Z0-9]{6}";
+
+        Pattern pattern = Pattern.compile(regex);
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> responseObject = objectMapper.readValue(response.getBody(), Map.class);
+
         assertEquals(HttpStatus.CREATED.getCode(), response.getStatusCode());
-        assertTrue(response.getBody().contains("Job accepted with ID: "));
+        assertTrue(pattern.matcher(responseObject.get("jobId")).matches());
     }
 
     @Test
