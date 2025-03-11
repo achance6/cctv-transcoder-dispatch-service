@@ -40,6 +40,7 @@ public class TranscoderDispatchService {
                     .build();
 
             createJobResponse = mediaConvertClient.createJob(createJobRequest);
+            LOGGER.info("Created MediaConvert job with job ID: {}", createJobResponse.job().id());
         }
 
         return createJobResponse.job().id();
