@@ -73,11 +73,15 @@ public class FunctionRequestHandlerTest {
 
         Pattern pattern = Pattern.compile(regex);
 
-        @SuppressWarnings("unchecked")
-        Map<String, String> responseObject = objectMapper.readValue(response.getBody(), Map.class);
+        Map<String, String> responseObject = null;
+        try {
+            responseObject = objectMapper.readValue(response.getBody(), Map.class);
+        } catch (IOException e) {
+            LOGGER.error("Error parsing response");
+        }
 
         assertEquals(HttpStatus.CREATED.getCode(), response.getStatusCode());
-        assertTrue(pattern.matcher(responseObject.get("jobId")).matches());
+        assertTrue(pattern.matcher(responseObject.get("jobId")).matches(), "Response does not match expected format, response was: " + responseObject);
     }
 
     @Test
