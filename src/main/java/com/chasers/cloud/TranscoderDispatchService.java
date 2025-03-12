@@ -1,5 +1,7 @@
 package com.chasers.cloud;
 
+import com.amazonaws.services.lambda.runtime.events.S3Event;
+import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,21 +20,36 @@ public class TranscoderDispatchService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranscoderDispatchService.class);
 
-    public String createMediaJob(String s3InputFileURI) {
+    public String createMediaJob(S3Event s3Event) {
+
+        LOGGER.info("Received request body: {}", s3Event);
+        S3EventNotification.S3EventNotificationRecord record = s3Event.getRecords().getFirst();
+
+        // Extract bucket name and object key
+        String bucketName = record.getS3().getBucket().getName();
+        String objectKey = record.getS3().getObject().getKey();
+
+        LOGGER.debug("Extracted bucket name: {}", bucketName);
+        LOGGER.debug("Extracted object key: {}", objectKey);
+
+        // Construct the ARN
+        String s3ObjectARN = String.format("s3://%s/%s", bucketName, objectKey);
+
+        LOGGER.info("Attempting to create media job with ARN: {}", s3ObjectARN);
         CreateJobResponse createJobResponse;
         try (MediaConvertClient mediaConvertClient = MediaConvertClient.create()) {
 
             String thumbsOutput = s3OutputURI + "thumbs/";
             String mp4Output = s3OutputURI + "mp4/";
 
-            LOGGER.debug("MediaConvert role arn: {}", mediaConvertRoleArn);
-            LOGGER.debug("MediaConvert input file: {}", s3InputFileURI);
+            LOGGER.debug("MediaConvert role ARN: {}", mediaConvertRoleArn);
+            LOGGER.debug("MediaConvert input file ARN: {}", s3ObjectARN);
             LOGGER.debug("MediaConvert output base path: {}", s3OutputURI);
 
             OutputGroup fileMp4 = createMp4OutputGroup(mp4Output);
             OutputGroup thumbsGroup = createThumbsOutputGroup(thumbsOutput);
 
-            JobSettings jobSettings = createJobSettings(s3InputFileURI, fileMp4, thumbsGroup);
+            JobSettings jobSettings = createJobSettings(s3ObjectARN, fileMp4, thumbsGroup);
 
             CreateJobRequest createJobRequest = CreateJobRequest.builder()
                     .role(mediaConvertRoleArn)
