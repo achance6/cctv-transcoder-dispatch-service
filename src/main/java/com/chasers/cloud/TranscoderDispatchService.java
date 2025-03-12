@@ -18,6 +18,10 @@ public class TranscoderDispatchService {
 
     private static final String s3OutputURI = "s3://cctv-transcoded-video-storage/";
 
+    private static final String thumbsOutput = s3OutputURI + "thumbs/";
+
+    private static final String mp4Output = s3OutputURI + "mp4/";
+
     private static final String mediaConvertRoleArn = "arn:aws:iam::442426851957:role/service-role/MediaConvert_Default_Role";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranscoderDispatchService.class);
@@ -46,24 +50,21 @@ public class TranscoderDispatchService {
         CreateJobResponse createJobResponse;
         try (MediaConvertClient mediaConvertClient = MediaConvertClient.create()) {
 
-            String thumbsOutput = s3OutputURI + "thumbs/";
-            String mp4Output = s3OutputURI + "mp4/";
-
             LOGGER.debug("MediaConvert role ARN: {}", mediaConvertRoleArn);
             LOGGER.debug("MediaConvert input file ARN: {}", s3ObjectARN);
             LOGGER.debug("MediaConvert output base path: {}", s3OutputURI);
 
-            OutputGroup fileMp4 = createMp4OutputGroup(mp4Output);
-            OutputGroup thumbsGroup = createThumbsOutputGroup(thumbsOutput);
+            OutputGroup fileMp4 = createMp4OutputGroup();
+            OutputGroup thumbsGroup = createThumbsOutputGroup();
 
             JobSettings jobSettings = createJobSettings(s3ObjectARN, fileMp4, thumbsGroup);
 
-            CreateJobRequest createJobRequest = CreateJobRequest.builder()
+            CreateJobRequest mediaConvertJob = CreateJobRequest.builder()
                     .role(mediaConvertRoleArn)
                     .settings(jobSettings)
                     .build();
 
-            createJobResponse = mediaConvertClient.createJob(createJobRequest);
+            createJobResponse = mediaConvertClient.createJob(mediaConvertJob);
             LOGGER.info("Created MediaConvert job with job ID: {}", createJobResponse.job().id());
         }
 
@@ -87,14 +88,14 @@ public class TranscoderDispatchService {
                 .build();
     }
 
-    private OutputGroup createMp4OutputGroup(String mp4Destination) {
+    private OutputGroup createMp4OutputGroup() {
         return OutputGroup.builder().name("File Group")
                 .outputGroupSettings(
                         OutputGroupSettings.builder()
                                 .type(OutputGroupType.FILE_GROUP_SETTINGS)
                                 .fileGroupSettings(
                                         FileGroupSettings.builder()
-                                                .destination(mp4Destination)
+                                                .destination(mp4Output)
                                                 .destinationSettings(
                                                         DestinationSettings.builder()
                                                                 .s3Settings(
@@ -112,7 +113,7 @@ public class TranscoderDispatchService {
                 ).build();
     }
 
-    private OutputGroup createThumbsOutputGroup(String thumbsOutput) {
+    private OutputGroup createThumbsOutputGroup() {
         return OutputGroup.builder()
                 .name("File Group")
                 .customName("thumbs")

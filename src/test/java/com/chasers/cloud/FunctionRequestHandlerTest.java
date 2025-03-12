@@ -1,8 +1,8 @@
 package com.chasers.cloud;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -61,7 +61,7 @@ public class FunctionRequestHandlerTest {
 
         S3Event eventNotification = new S3Event(List.of(s3Event));
 
-        APIGatewayProxyResponseEvent response = handler.execute(eventNotification);
+        HttpResponse<String> response = handler.execute(eventNotification);
 
         String regex = "[0-9]{12,}-[a-zA-Z0-9]{6}";
 
@@ -69,13 +69,13 @@ public class FunctionRequestHandlerTest {
 
         Map<?, ?> responseObject = null;
         try {
-            responseObject = objectMapper.readValue(response.getBody(), Map.class);
+            responseObject = objectMapper.readValue(response.getBody().orElseThrow(), Map.class);
         } catch (IOException e) {
             LOGGER.error("Error parsing response");
         }
         assertNotNull(responseObject);
 
-        assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatus());
         assertTrue(pattern.matcher((String) responseObject.get("jobId")).matches(), "Response does not match expected format, response was: " + responseObject);
     }
 
@@ -85,6 +85,6 @@ public class FunctionRequestHandlerTest {
 
         var response = handler.execute(request);
 
-        assertEquals(HttpStatus.BAD_REQUEST.getCode(), response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
     }
 }
