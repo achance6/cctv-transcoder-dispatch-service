@@ -1,8 +1,8 @@
 package com.chasers.cloud;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification;
-import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -43,9 +43,6 @@ public class FunctionRequestHandlerTest {
 
     @Test
     public void testHandler(ObjectMapper objectMapper) throws IOException {
-        APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
-        request.setHttpMethod(HttpMethod.POST.toString());
-        request.setPath("/");
 
         S3EventNotification.S3EventNotificationRecord s3Event = new S3EventNotification.S3EventNotificationRecord(
                 Region.US_EAST_1.toString(),
@@ -61,13 +58,9 @@ public class FunctionRequestHandlerTest {
                 new S3EventNotification.UserIdentityEntity("AIDAJDPLRKLG7UEXAMPLE")
         );
 
-        S3EventNotification eventNotification = new S3EventNotification(List.of(s3Event));
+        S3Event eventNotification = new S3Event(List.of(s3Event));
 
-        String s3EventJson = objectMapper.writeValueAsString(eventNotification);
-        LOGGER.info("Sending request: {}", eventNotification);
-        request.setBody(s3EventJson);
-
-        APIGatewayProxyResponseEvent response = handler.execute(request);
+        APIGatewayProxyResponseEvent response = handler.execute(eventNotification);
 
         String regex = "[0-9]{12,}-[a-zA-Z0-9]{6}";
 
@@ -86,27 +79,10 @@ public class FunctionRequestHandlerTest {
 
     @Test
     public void testBadRequest() {
-        APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
-        request.setPath("/");
-        request.setHttpMethod(HttpMethod.POST.toString());
-
-        request.setBody("");
+        S3Event request = new S3Event();
 
         var response = handler.execute(request);
 
         assertEquals(HttpStatus.BAD_REQUEST.getCode(), response.getStatusCode());
-    }
-
-    @Test
-    public void testGetRequest() {
-        APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
-        request.setPath("/");
-        request.setHttpMethod(HttpMethod.GET.toString());
-
-        request.setBody("");
-
-        var response = handler.execute(request);
-
-        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.getStatusCode());
     }
 }
