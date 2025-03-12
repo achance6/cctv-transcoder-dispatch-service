@@ -22,20 +22,7 @@ public class TranscoderDispatchService {
 
     public String createMediaJob(S3Event s3Event) {
 
-        LOGGER.info("Received request body: {}", s3Event);
-        S3EventNotification.S3EventNotificationRecord record = s3Event.getRecords().getFirst();
-
-        // Extract bucket name and object key
-        String bucketName = record.getS3().getBucket().getName();
-        String objectKey = record.getS3().getObject().getKey();
-
-        LOGGER.debug("Extracted bucket name: {}", bucketName);
-        LOGGER.debug("Extracted object key: {}", objectKey);
-
-        // Construct the ARN
-        String s3ObjectARN = String.format("s3://%s/%s", bucketName, objectKey);
-
-        LOGGER.info("Attempting to create media job with ARN: {}", s3ObjectARN);
+        String s3ObjectARN = parseS3EventARN(s3Event);
         CreateJobResponse createJobResponse;
         try (MediaConvertClient mediaConvertClient = MediaConvertClient.create()) {
 
@@ -61,6 +48,24 @@ public class TranscoderDispatchService {
         }
 
         return createJobResponse.job().id();
+    }
+
+    private static String parseS3EventARN(S3Event s3Event) {
+        LOGGER.info("Received request body: {}", s3Event);
+        S3EventNotification.S3EventNotificationRecord record = s3Event.getRecords().getFirst();
+
+        // Extract bucket name and object key
+        String bucketName = record.getS3().getBucket().getName();
+        String objectKey = record.getS3().getObject().getKey();
+
+        LOGGER.debug("Extracted bucket name: {}", bucketName);
+        LOGGER.debug("Extracted object key: {}", objectKey);
+
+        // Construct the ARN
+        String s3ObjectARN = String.format("s3://%s/%s", bucketName, objectKey);
+
+        LOGGER.info("Attempting to create media job with ARN: {}", s3ObjectARN);
+        return s3ObjectARN;
     }
 
     private JobSettings createJobSettings(String s3InputFileURI, OutputGroup... outputGroups) {
