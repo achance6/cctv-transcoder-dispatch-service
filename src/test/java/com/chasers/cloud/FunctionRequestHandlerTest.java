@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -53,7 +55,7 @@ public class FunctionRequestHandlerTest {
                 new S3EventNotification.RequestParametersEntity("127.0.0.1"),
                 new S3EventNotification.ResponseElementsEntity("C3D13FE58DE4C810", "FMyUVURIY8/IgAtTv8xRjskZQpcIZ9KG4V5Wp6S7S/JRWeUWerMUE5JgHvANOjpD"),
                 new S3EventNotification.S3Entity("testConfigRule", new S3EventNotification.S3BucketEntity("cctv-video-storage", new S3EventNotification.UserIdentityEntity("A3NL1KOZZKExample"), "arn:aws:s3:::cctv-video-storage"),
-                        new S3EventNotification.S3ObjectEntity("Me at the zoo.mp4", 1100L, "4e088404aece61e07e7cfc8752927f35", "gKpkHSFzm.3lnBK.vAADCoqwAPiMFsOA", "0055AED6DCD90281E5"),
+                        new S3EventNotification.S3ObjectEntity(URLEncoder.encode("Me at the zoo.mp4", StandardCharsets.UTF_8), 1100L, "4e088404aece61e07e7cfc8752927f35", "gKpkHSFzm.3lnBK.vAADCoqwAPiMFsOA", "0055AED6DCD90281E5"),
                         "1.0"),
                 new S3EventNotification.UserIdentityEntity("AIDAJDPLRKLG7UEXAMPLE")
         );
