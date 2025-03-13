@@ -37,10 +37,10 @@ public class FunctionRequestHandler extends MicronautRequestHandler<S3Event, API
 
         try {
             String json = new String(objectMapper.writeValueAsBytes(Collections.singletonMap("jobId", jobId)));
-            response.setStatusCode(201);
+            response.setStatusCode(HttpStatus.OK.getCode());
             response.setBody(json);
         } catch (IOException e) {
-            response.setStatusCode(500);
+            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.getCode());
         }
         return response;
     }

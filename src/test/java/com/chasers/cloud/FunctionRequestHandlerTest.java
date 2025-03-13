@@ -42,7 +42,7 @@ public class FunctionRequestHandlerTest {
     }
 
     @Test
-    public void testHandler(ObjectMapper objectMapper) throws IOException {
+    public void testHandler(ObjectMapper objectMapper) {
 
         S3EventNotification.S3EventNotificationRecord s3Event = new S3EventNotification.S3EventNotificationRecord(
                 Region.US_EAST_1.toString(),
@@ -73,7 +73,7 @@ public class FunctionRequestHandlerTest {
             LOGGER.error("Error parsing response");
         }
 
-        assertEquals(HttpStatus.CREATED.getCode(), response.getStatusCode());
+        assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
         assertTrue(pattern.matcher(responseObject.get("jobId")).matches(), "Response does not match expected format, response was: " + responseObject);
     }
 
