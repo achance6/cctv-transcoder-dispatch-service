@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.mediaconvert.MediaConvertClient;
 import software.amazon.awssdk.services.mediaconvert.model.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +27,8 @@ public class TranscoderDispatchService {
         S3EventNotification.S3EventNotificationRecord record = s3Event.getRecords().getFirst();
 
         // Extract bucket name and object key
-        String bucketName = record.getS3().getBucket().getName();
-        String objectKey = record.getS3().getObject().getKey();
+        String bucketName = URLDecoder.decode(record.getS3().getBucket().getName(), StandardCharsets.UTF_8);
+        String objectKey = URLDecoder.decode(record.getS3().getObject().getKey(), StandardCharsets.UTF_8);
 
         LOGGER.debug("Extracted bucket name: {}", bucketName);
         LOGGER.debug("Extracted object key: {}", objectKey);
