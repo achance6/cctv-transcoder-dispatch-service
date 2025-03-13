@@ -1,7 +1,6 @@
 package com.chasers.cloud;
 
 import com.amazonaws.services.lambda.runtime.events.S3Event;
-import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification;
 import io.micronaut.function.aws.MicronautRequestHandler;
 
 import java.io.IOException;
