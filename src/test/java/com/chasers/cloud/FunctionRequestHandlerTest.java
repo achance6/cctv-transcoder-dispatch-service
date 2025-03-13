@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest
 public class FunctionRequestHandlerTest {
@@ -68,15 +67,16 @@ public class FunctionRequestHandlerTest {
 
         Pattern pattern = Pattern.compile(regex);
 
-        Map<String, String> responseObject = null;
+        Map<?, ?> responseObject = null;
         try {
             responseObject = objectMapper.readValue(response.getBody(), Map.class);
         } catch (IOException e) {
             LOGGER.error("Error parsing response");
         }
+        assertNotNull(responseObject);
 
         assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
-        assertTrue(pattern.matcher(responseObject.get("jobId")).matches(), "Response does not match expected format, response was: " + responseObject);
+        assertTrue(pattern.matcher((String) responseObject.get("jobId")).matches(), "Response does not match expected format, response was: " + responseObject);
     }
 
     @Test
